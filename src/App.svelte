@@ -1,55 +1,57 @@
 <script>
   import { onMount } from "svelte";
-  import { token, list, log} from './store.js';
+  import { token, list, log } from './store.js';
+  import { login, check_token, send_product, get_list } from './utils.js';
+  import {get} from "svelte/store";
+
+  let user = { loggedIn: false };
 
   $list = [...$list]
 
+  const logout = () => {
+    localStorage.removeItem('token');
+    console.log("token",get(token));
+    $token = null;
+    window.location.href = window.location.origin;
+  }
+
   onMount(async () => {
-    if (window.location.href.split('=').length <= 1) {
-        const client_id = "2cct9b33ba202phg61fspdppho";
-        const cognito_domain = "login-ze0zatn0ipkhxh56";
-        const region = "us-east-1";
-        const redirect = "https://dash.cabd.link";
-        const aws_cognito_login_domain = "https://" + cognito_domain + ".auth." + region + ".amazoncognito.com";
-        const cognitoUrl_fromUserPoolUI = aws_cognito_login_domain + "/login?client_id=" + client_id + "&response_type=token&scope=email+openid+phone&redirect_uri=" + redirect;
-        window.location.href = cognitoUrl_fromUserPoolUI;
-    } else {
-        const tokenx = window.location.href.split('=')[1].split('&')[0];
-        console.log("access_token:", tokenx);
-        token.set(tokenx);
-        await get_list();
+    check_token();
+    if (localStorage.getItem('token')) {
+      user.loggedIn = true;
+      $token = localStorage.getItem('token');
+      $list = await get_list();
     }
+    console.log('user', user)
   });
 
-  const get_list = async () => {
-    const response = await fetch('https://api-dev.cabd.link/api2',{
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-    $list = await response.json();
-    console.log("list:",$list);
-  };
-  const send_list = async () => {
-      console.log("token",$token)
-      let data1 = '[{"text": "mushoku","price":"20.01","symbol":"R$","url":"localhost","type":"kindle"},{"text": "mushoku1","price":"20.01","symbol":"R$","url":"localhost","type":"kindle"}]';
-      const response = await fetch('https://api-dev.cabd.link/api2',{
-          method: 'POST',
-          body: data1,
-          headers: {
-            'Authorization': $token,
-            'Content-Type': 'application/json'
-          }
-      });
-      $log = [...$log, await response.json()]
-      console.log("log:",$log);
-  };
-
+  let url = '';
+  let price= '';
+  const send_new_product = async () => {
+    $log = [...$log, await send_product(get(token),url, price)];
+    $list = await get_list();
+  }
 </script>
 <main>
   <h1>List</h1>
-  <button on:click={send_list}>Click me</button>
+
+  {#if user.loggedIn}
+    URL:<input style="width: 400px" bind:value={url}>
+    $<input style="width: 100px" bind:value={price}>
+    <button on:click={send_new_product}>Adicionar</button>
+    <button on:click={logout}>Logout</button>
+  {:else}
+    <div class="col s12 m6 offset-m3 center-align">
+      <a class="oauth-container btn darken-4 white black-text" href="#" on:click="{login}" style="text-transform:none">
+        <div class="left">
+          <img width="20px" style="margin-top:7px; margin-right:8px" alt="Google sign-in"
+               src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" />
+        </div>
+        Login with Google
+      </a>
+    </div>
+  {/if}
+
   <ul>
     {#each $log as item}
       <li>
@@ -65,5 +67,3 @@
     {/each}
   </ul>
 </main>
-<style>
-</style>

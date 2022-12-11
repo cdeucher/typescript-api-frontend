@@ -9,8 +9,8 @@ const get_list = async () => {
     });
     return await response.json();
 };
-const send_product = async (token, url , price) => {
-    let data1 = '[{"text": "...","price":"'+price+'","symbol":"...","url":"'+url+'","type":"..."}]';
+const send_product = async (token, url , price_target) => {
+    let data1 = '[{"price_target":"'+price_target+'","url":"'+url+'"}]';
     const response = await fetch('https://api-dev.cabd.link/api2',{
         method: 'POST',
         body: data1,
@@ -19,7 +19,7 @@ const send_product = async (token, url , price) => {
             'Content-Type': 'application/json'
         }
     });
-    return await response.json()
+    return await response.json();
 };
 const check_token = () => {
     console.log("split:", window.location.href.split('id_token='));

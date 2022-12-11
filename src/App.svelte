@@ -26,9 +26,16 @@
   });
 
   let url = '';
-  let price= '';
+  let price_target= '';
+  const check_errors = (request) => {
+    if (request.message) {
+      login();
+    }
+  }
   const send_new_product = async () => {
-    $log = [...$log, await send_product(get(token),url, price)];
+    let request = await send_product(get(token),url, price_target);
+    check_errors(request);
+    $log = [...$log, request];
     $list = await get_list();
   }
 </script>
@@ -37,7 +44,7 @@
 
   {#if user.loggedIn}
     URL:<input style="width: 400px" bind:value={url}>
-    $<input style="width: 100px" bind:value={price}>
+    $<input style="width: 100px" bind:value={price_target}>
     <button on:click={send_new_product}>Adicionar</button>
     <button on:click={logout}>Logout</button>
   {:else}
@@ -62,7 +69,7 @@
   <ul>
     {#each $list as item}
       <li>
-        {item.text} - {item.price} - {item.symbol} - {item.url} - {item.type}
+        ({item.price_target})({item.price}): {item.title}
       </li>
     {/each}
   </ul>

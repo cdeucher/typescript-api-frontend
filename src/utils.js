@@ -24,7 +24,12 @@ const send_product = async (token, url , price_target) => {
 const check_token = () => {
     console.log("split:", window.location.href.split('id_token='));
     if (window.location.href.split('id_token=').length > 1) {
-        const token = window.location.href.split('=')[1].split('&')[0];
+        let token = ''
+        if (window.location.href.split('access_token').length > 1) {
+            token = window.location.href.split('=')[2].split('&')[0];
+        } else {
+            token = window.location.href.split('=')[1].split('&')[0];
+        }
         console.log("access_token:", token);
         localStorage.setItem('token', token);
     }

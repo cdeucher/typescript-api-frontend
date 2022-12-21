@@ -1,7 +1,7 @@
 import { token, list, log } from './store.js';
 
 const get_list = async () => {
-    const response = await fetch('https://api-dev.cabd.link/api2',{
+    const response = await fetch('https://api-dev.cabd.link/api',{
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -11,7 +11,7 @@ const get_list = async () => {
 };
 const send_product = async (token, url , price_target) => {
     let data1 = '[{"price_target":"'+price_target+'","url":"'+url+'"}]';
-    const response = await fetch('https://api-dev.cabd.link/api2',{
+    const response = await fetch('https://api-dev.cabd.link/api',{
         method: 'POST',
         body: data1,
         headers: {
@@ -36,7 +36,7 @@ const check_token = () => {
 }
 const login = () => {
     if (window.location.href.split('id_token=').length <= 1) {
-        const client_id = "2cct9b33ba202phg61fspdppho";
+        const client_id = "3fhjs4it7br6bmn96rk98jrs4h";
         const cognito_domain = "login-ze0zatn0ipkhxh56";
         const region = "us-east-1";
         const redirect = "https://dash.cabd.link";

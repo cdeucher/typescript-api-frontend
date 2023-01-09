@@ -1,8 +1,8 @@
 <script>
   import { onMount } from "svelte";
-  import { token, list, log } from './store.js';
-  import { login, check_token, send_product, get_list } from './utils.js';
   import {get} from "svelte/store";
+  import { token, list, log } from './store.ts';
+  import {login, get_list, send_product, check_token, subscribe} from './utils.ts';
 
   let user = { loggedIn: false };
 
@@ -27,16 +27,9 @@
 
   let url = '';
   let price_target= '';
-  const check_errors = (request) => {
-    if (request.message) {
-      login();
-    }
-  }
+
   const send_new_product = async () => {
-    let request = await send_product(get(token),url, price_target);
-    console.log("request",request);
-    check_errors(request);
-    $log = [...$log, request];
+    await send_product(get(token),url, price_target);
     $list = await get_list();
   }
 </script>
@@ -67,11 +60,31 @@
       </li>
     {/each}
   </ul>
-  <ul>
-    {#each $list as item}
-      <li>
-        ({item.price_target})({item.price}): {item.title}
-      </li>
-    {/each}
+  <ul style="padding-left:0px">
+    <li style="display:inline">
+      TARGET -
+    </li>
+    <li style="display:inline">
+      PRICE -
+    </li>
+    <li style="display:inline">
+      PRODUCT
+    </li>
   </ul>
+  {#each $list as item}
+  <ul style="padding-left:0px">
+    <li style="display:inline">
+      {item.price_target} -
+    </li>
+    <li style="display:inline">
+      {item.price} -
+    </li>
+    <li style="display:inline">
+      {item.title}
+    </li>
+    <li style="display:inline">
+      <a href="#" on:click="{subscribe(item.id, 'email', token)}" style="text-transform:none">subscribe</a>
+    </li>
+  </ul>
+  {/each}
 </main>

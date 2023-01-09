@@ -34,6 +34,7 @@
   }
   const send_new_product = async () => {
     let request = await send_product(get(token),url, price_target);
+    console.log("request",request);
     check_errors(request);
     $log = [...$log, request];
     $list = await get_list();
